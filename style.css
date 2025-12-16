@@ -1135,3 +1135,310 @@ body.theme-bahay .auth-card {
 .auth-footer a:hover {
     text-decoration: underline;
 }
+
+/* AI ChatBubble */
+
+
+.float-orb{
+  position: fixed;
+  z-index: 999999;
+
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+
+  right: 22px;
+  bottom: 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ff5a2a;
+  border: 2px solid rgba(255,255,255,0.85);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.55);
+
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+
+  /* 🆕 smooth hover animation */
+  transition:
+    box-shadow 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 420ms ease;
+}
+
+.float-orb i{
+  color: #fff;
+  font-size: 22px;
+
+  /* 🆕 icon animation */
+   transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 🆕 hover effect */
+.float-orb:hover{
+  transform: translateY(-4px) scale(1.03);
+  background: #ff6a3d;
+  box-shadow:
+    0 18px 36px rgba(0,0,0,0.65),
+    0 0 18px rgba(255,90,42,0.6);
+}
+
+/* 🆕 icon pops slightly */
+.float-orb:hover i{
+  transform: scale(1.15);
+}
+
+/* active (dragging / clicking) */
+.float-orb:active{
+  cursor: grabbing;
+  transform: scale(0.96);
+}
+
+
+/* smooth snap animation */
+.float-orb.snap-anim{
+  transition: left 220ms ease, top 220ms ease;
+}
+
+/* 🆕 AI Chat Overlay */
+.ai-chat-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 999998;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-chat-overlay.hidden{
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* overlay stays the same */
+.ai-chat-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 999998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-chat-overlay.hidden{
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* 🆕 White card like Tidio */
+.ai-chatbox{
+  width: 380px;
+  height: 560px;
+  background: #ffffff;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.55);
+
+  display: flex;
+  flex-direction: column;
+
+  transform: scale(0.2);
+  opacity: 0;
+  transition:
+    transform 480ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 360ms ease;
+}
+
+.ai-chat-overlay.active .ai-chatbox{
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* 🆕 Gradient header */
+.ai-topbar{
+  padding: 14px 14px 16px 14px;
+  color: #fff;
+  background: linear-gradient(90deg, #2f6cff, #00b7ff);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.ai-top-left{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ai-avatar{
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+}
+
+.ai-title-wrap{ line-height: 1.1; }
+.ai-title{ font-weight: 700; font-size: 16px; }
+.ai-status{ font-size: 12px; opacity: 0.95; margin-top: 6px; display:flex; align-items:center; gap:6px; }
+.ai-dot{
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #3cff63;
+  box-shadow: 0 0 0 3px rgba(60,255,99,0.25);
+}
+
+.ai-top-actions{ display:flex; gap:8px; }
+.ai-icon-btn{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* body like card */
+.ai-body{
+  flex: 1;
+  padding: 14px;
+  background: #f4f7fb;
+  overflow-y: auto;
+}
+
+.ai-card-media{
+  height: 150px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.08), rgba(0,0,0,0.02));
+  margin-bottom: 12px;
+}
+
+.ai-bubble{
+  max-width: 85%;
+  background: #ffffff;
+  color: #2b2b2b;
+  padding: 12px 14px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  margin-bottom: 12px;
+}
+
+.ai-quick{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-bottom: 6px;
+}
+
+.ai-chip{
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 2px solid #2f6cff;
+  background: #fff;
+  color: #2f6cff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ai-chip:hover{
+  background: #2f6cff;
+  color: #fff;
+}
+
+/* footer input */
+.ai-footer{
+  padding: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  background: #ffffff;
+}
+
+.ai-textbox{
+  flex: 1;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.12);
+  padding: 0 14px;
+  outline: none;
+}
+
+.ai-send{
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: none;
+  background: #2f6cff;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(47,108,255,0.35);
+}
+
+.ai-powered{
+  font-size: 10px;
+  text-align: center;
+  padding: 10px 0 12px;
+  color: rgba(0,0,0,0.45);
+  background: #ffffff;
+}
+
+
+#ai-chat-messages,
+.chat-messages,
+.messages {
+  overflow: visible;     /* ✅ no inner scroll */
+  max-height: none;      /* ✅ let .ai-body handle height */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+
+.chat-msg {
+  max-width: 78%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  color: #000;
+  line-height: 1.35;
+  word-wrap: break-word;
+}
+
+.ai-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 360px; /* adjust to your layout */
+  padding-right: 6px;
+}
+
+.chat-msg.user {
+  align-self: flex-end;
+  background: #ffffff;          /* same as bot bubble */
+  color: #000;                  /* black text */
+  padding: 12px 14px;
+  border-radius: 16px;
+  border-bottom-right-radius: 6px; /* messenger-style tail */
+  max-width: 78%;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+#ai-chatbox { transition: transform 0.30s ease, opacity 0.25s ease; }
+
+
+
+.chat-msg.user { margin-left: auto; }
+.chat-msg.bot  { margin-right: auto; }
+
+

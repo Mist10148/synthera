@@ -516,3 +516,361 @@ function setTheme(themeName) {
     }
     localStorage.setItem('syntheraTheme', themeName);
 }
+
+function setBoxFlyFromOrb(opening) {
+  const box = document.getElementById("ai-chatbox");
+  if (!box) return;
+
+  const orb = document.getElementById("float-orb");
+  if (!orb) return;
+
+  const orbR = orb.getBoundingClientRect();
+  const boxR = box.getBoundingClientRect();
+
+  const orbCX = orbR.left + orbR.width / 2;
+  const orbCY = orbR.top + orbR.height / 2;
+
+  const boxCX = boxR.left + boxR.width / 2;
+  const boxCY = boxR.top + boxR.height / 2;
+
+  const dx = orbCX - boxCX;
+  const dy = orbCY - boxCY;
+
+  // small scale so it really feels like it comes from orb
+  const MIN_SCALE = 0.08;
+
+  if (opening) {
+    // start at orb position (translate to orb center + shrink)
+    box.style.transform = `translate(${dx}px, ${dy}px) scale(${MIN_SCALE})`;
+  } else {
+    // end at orb position
+    box.style.transform = `translate(${dx}px, ${dy}px) scale(${MIN_SCALE})`;
+  }
+}
+
+
+function toggleAIChat() {
+  const overlay = document.getElementById("ai-chat-overlay");
+  if (!overlay) return;
+
+  const isOpen = overlay.classList.contains("active");
+
+  if (isOpen) {
+    closeAIChat();
+  } else {
+    openAIChat();
+  }
+}
+
+function getOrbCenter() {
+  const orb = document.getElementById("float-orb");
+  if (!orb) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  const r = orb.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
+
+function setBoxOriginFromPoint(x, y) {
+  const box = document.getElementById("ai-chatbox");
+  if (!box) return;
+
+  const br = box.getBoundingClientRect();
+  const localX = x - br.left;
+  const localY = y - br.top;
+
+  const ox = Math.max(0, Math.min(localX, br.width));
+  const oy = Math.max(0, Math.min(localY, br.height));
+
+  box.style.transformOrigin = `${ox}px ${oy}px`;
+}
+
+
+function openAIChat() {
+  const overlay = document.getElementById("ai-chat-overlay");
+  const box = document.getElementById("ai-chatbox");
+  if (!overlay || !box) return;
+
+  overlay.classList.remove("hidden");
+  overlay.classList.remove("active");
+
+  // Ensure starting state applies immediately
+  box.style.transition = "none";
+  void overlay.offsetHeight;
+
+  // 1) place chatbox at orb (shrunken)
+  setBoxFlyFromOrb(true);
+
+  // force apply
+  void box.offsetHeight;
+
+  // 2) animate to normal position/scale
+  box.style.transition = "";
+  requestAnimationFrame(() => {
+    overlay.classList.add("active");
+    box.style.transform = ""; // back to CSS default (scale 1, translate 0)
+  });
+}
+
+
+
+function closeAIChat() {
+  const overlay = document.getElementById("ai-chat-overlay");
+  const box = document.getElementById("ai-chatbox");
+  if (!overlay || !box) return;
+
+  const AI_CLOSE_MS = 520;
+
+  // 1) shrink/fly FIRST (visible)
+  setBoxFlyFromOrb(false);
+
+  // 2) delay overlay fade so you can SEE the shrink
+  setTimeout(() => {
+    overlay.classList.remove("active"); // now fade backdrop out
+  }, 120); // tweak 80–180ms
+
+  // 3) hide after everything finishes
+  setTimeout(() => {
+    overlay.classList.add("hidden");
+    box.style.transform = ""; // reset for next open
+  }, AI_CLOSE_MS);
+}
+
+
+
+let orbDidDrag = false;
+let orbDownPoint = { x: 0, y: 0 };
+const ORB_DRAG_THRESHOLD = 6; // px (tweak 4-10)
+
+
+// 🆕 Floating draggable orb (Messenger-style snap)
+function initFloatingOrb() {
+  const orb = document.getElementById("float-orb");
+  if (!orb) {
+    console.warn("[Orb] #float-orb not found in DOM.");
+    return;
+  }
+
+  // Default starting point (in case no saved pos)
+  orb.style.right = "22px";
+  orb.style.bottom = "22px";
+
+  // Restore last position (optional)
+  const saved = localStorage.getItem("syntheraOrbPos");
+  if (saved) {
+    try {
+      const { left, top } = JSON.parse(saved);
+      if (typeof left === "number" && typeof top === "number") {
+        orb.style.left = left + "px";
+        orb.style.top = top + "px";
+        orb.style.right = "auto";
+        orb.style.bottom = "auto";
+      }
+    } catch {}
+  }
+
+  let isDown = false;
+  let startX = 0, startY = 0;
+  let origLeft = 0, origTop = 0;
+
+  const getPoint = (e) => {
+    if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    return { x: e.clientX, y: e.clientY };
+  };
+
+  const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
+
+const onDown = (e) => {
+  e.preventDefault();
+  isDown = true;
+
+  // ✅ reset drag state on press
+  orbDidDrag = false;
+
+  orb.classList.remove("snap-anim");
+
+  const rect = orb.getBoundingClientRect();
+  origLeft = rect.left;
+  origTop = rect.top;
+
+  const p = getPoint(e);
+  startX = p.x;
+  startY = p.y;
+
+  // ✅ store down point for threshold comparison
+  orbDownPoint = { x: p.x, y: p.y };
+
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("touchend", onUp);
+};
+
+const onMove = (e) => {
+  if (!isDown) return;
+  e.preventDefault();
+
+  const p = getPoint(e);
+  const dx = p.x - startX;
+  const dy = p.y - startY;
+
+  // ✅ mark as dragged once we pass threshold
+  const movedX = p.x - orbDownPoint.x;
+  const movedY = p.y - orbDownPoint.y;
+  if (!orbDidDrag && Math.hypot(movedX, movedY) > ORB_DRAG_THRESHOLD) {
+    orbDidDrag = true;
+  }
+
+  orb.style.left = (origLeft + dx) + "px";
+  orb.style.top  = (origTop + dy) + "px";
+
+  orb.style.right = "auto";
+  orb.style.bottom = "auto";
+};
+
+const onUp = () => {
+  if (!isDown) return;
+  isDown = false;
+
+  window.removeEventListener("mousemove", onMove);
+  window.removeEventListener("mouseup", onUp);
+  window.removeEventListener("touchmove", onMove);
+  window.removeEventListener("touchend", onUp);
+
+  // ✅ snap + save (your existing code)
+  const edgePadX = 350;
+  const edgePadTop = 95;
+  const edgePadBottom = 34;
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const rect = orb.getBoundingClientRect();
+
+  const centerX = rect.left + rect.width / 2;
+  const snapLeft = centerX < vw / 2;
+
+  const left = snapLeft ? edgePadX : (vw - rect.width - edgePadX);
+  const top = clamp(rect.top, edgePadTop, vh - rect.height - edgePadBottom);
+
+  orb.classList.add("snap-anim");
+  orb.style.left = left + "px";
+  orb.style.top = top + "px";
+  orb.style.right = "auto";
+  orb.style.bottom = "auto";
+
+  localStorage.setItem("syntheraOrbPos", JSON.stringify({ left, top }));
+};
+
+
+  orb.addEventListener("mousedown", onDown);
+  orb.addEventListener("touchstart", onDown, { passive: false });
+
+  console.log("[Orb] Initialized.");
+}
+
+// ✅ ensure it runs even if script is loaded before element (just in case)
+document.addEventListener("DOMContentLoaded", initFloatingOrb);
+
+// 🆕 AI Chatbox toggle (clean + single listener)
+document.addEventListener("DOMContentLoaded", () => {
+  const orbEl = document.getElementById("float-orb");
+  const aiOverlayEl = document.getElementById("ai-chat-overlay");
+  const aiBoxEl = document.getElementById("ai-chatbox");
+
+    if (!orbEl || !aiOverlayEl || !aiBoxEl) return;
+
+        orbEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+
+        if (orbDidDrag) {
+            orbDidDrag = false;
+            return;
+        }
+
+        const overlay = document.getElementById("ai-chat-overlay");
+        if (!overlay) return;
+
+        if (overlay.classList.contains("active")) closeAIChat();
+        else openAIChat();
+        });
+
+});
+
+function initAIChatComposer() {
+  const aiOverlayEl = document.getElementById("ai-chat-overlay");
+  const aiBoxEl = document.getElementById("ai-chatbox");
+  if (!aiOverlayEl || !aiBoxEl) return;
+
+  // 🔍 Find elements inside your chatbox (supports unknown IDs)
+  const input =
+    aiBoxEl.querySelector("#ai-chat-input") ||
+    aiBoxEl.querySelector('input[type="text"]') ||
+    aiBoxEl.querySelector("textarea");
+
+  const sendBtn =
+    aiBoxEl.querySelector("#ai-chat-send") ||
+    aiBoxEl.querySelector('button[type="submit"]') ||
+    aiBoxEl.querySelector(".send-btn");
+
+    const list =
+    aiBoxEl.querySelector("#ai-chat-messages") ||
+    aiBoxEl.querySelector(".chat-messages") ||
+    aiBoxEl.querySelector(".messages");
+
+    const scrollWrap =
+    aiBoxEl.querySelector(".ai-body") || list;
+
+
+  if (!input || !sendBtn || !list) {
+    console.warn("[AI Chat] Missing:", { input: !!input, sendBtn: !!sendBtn, list: !!list });
+    return;
+  }
+
+    const appendMessage = (text, who = "user") => {
+    const msg = document.createElement("div");
+    msg.className = `chat-msg ${who}`;
+    msg.textContent = text;
+
+    list.appendChild(msg);
+
+    // ✅ auto-scroll to latest message
+    scrollWrap.scrollTop = scrollWrap.scrollHeight;
+    };
+
+
+  const sendMessage = () => {
+    const text = (input.value || "").trim();
+    if (!text) return;
+    appendMessage(text, "user");
+    input.value = "";
+  };
+
+  // ✅ Prevent Enter from submitting a form (if your input is inside one)
+  const form = input.closest("form");
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      sendMessage();
+    });
+  }
+
+  // ✅ Enter to send (Shift+Enter keeps newline for textarea)
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // ✅ Click send
+  sendBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    sendMessage();
+  });
+
+  console.log("[AI Chat] Composer initialized ✅");
+}
+
+// ✅ Add this near the bottom (only once)
+document.addEventListener("DOMContentLoaded", initAIChatComposer);
+
+
+

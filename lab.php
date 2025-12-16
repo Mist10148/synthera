@@ -12,16 +12,20 @@ session_start();
     <link rel="stylesheet" href="style.css?v=7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script>
+        <script>
         (function() {
             const savedTheme = localStorage.getItem('syntheraTheme');
-            let classes = 'lab-page';
-            if (savedTheme && savedTheme !== 'dark') {
-                classes += ' ' + savedTheme;
-            }
+            const classes = savedTheme && savedTheme !== 'dark'
+            ? 'lab-page ' + savedTheme
+            : 'lab-page';
+
+            // ✅ wait for body to exist
+            document.addEventListener("DOMContentLoaded", () => {
             document.body.className = classes;
+            });
         })();
-    </script>
+        </script>
+
 
 </head>
 <body class="lab-page">
@@ -127,6 +131,8 @@ session_start();
                 </div>
             </div>
 
+            
+
             <div class="sidebar-right">
                 <div class="report-header">Live Report</div>
                 <div id="live-log"></div>
@@ -134,6 +140,60 @@ session_start();
             </div>
         </div>
     </div>
+
+            <!-- 🆕 Floating draggable orb -->
+        <div id="float-orb" class="float-orb" title="Assistant">
+        <i class="fa-solid fa-comment-dots"></i>
+        </div>
+
+        <!-- 🆕 AI Chatbox Overlay (keep it under body so animation math is correct) -->
+        <div id="ai-chat-overlay" class="ai-chat-overlay hidden">
+        <div id="ai-chatbox" class="ai-chatbox">
+            <div class="ai-topbar">
+            <div class="ai-top-left">
+                <div class="ai-avatar"></div>
+                <div class="ai-title-wrap">
+                <div class="ai-title">Chat with us!</div>
+                <div class="ai-status"><span class="ai-dot"></span>We’re online!</div>
+                </div>
+            </div>
+
+            <div class="ai-top-actions">
+                <button class="ai-icon-btn" title="Menu">⋮</button>
+                <button class="ai-icon-btn" title="Close" onclick="closeAIChat()">×</button>
+            </div>
+            </div>
+
+                <div class="ai-body">
+                <div class="ai-card-media"></div>
+
+                <!-- ✅ New messages list container -->
+                <div id="ai-chat-messages" class="ai-messages">
+                    <div class="ai-bubble bot">
+                    Hello! This lab protocol can be started now. What do you want to do?
+                    </div>
+
+                    <div class="ai-quick">
+                    <button class="ai-chip">Protocol 1</button>
+                    <button class="ai-chip">Protocol 2</button>
+                    <button class="ai-chip">Help</button>
+                    </div>
+                </div>
+                </div>
+
+
+            <div class="ai-footer">
+                <input id="ai-chat-input" class="ai-textbox" type="text" placeholder="Enter your message..." />
+                <button id="ai-chat-send" class="ai-send" aria-label="Send" type="button">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+
+
+            <div class="ai-powered">POWERED BY <strong>Synthera</strong></div>
+        </div>
+        </div>
+
 
     <script src="script.js"></script>
 
