@@ -1,23 +1,20 @@
 /* =========================================
-   1. GLOBAL VARIABLES & THEMES (COLORS ONLY)
+   1. GLOBAL VARIABLES
    ========================================= */
 
 :root {
-    /* DEFAULT (DARK MODE) */
     --bg-main: #0a0a0f;
-    --bg-panel: rgba(22, 22, 29, 0.95);
-    --bg-nav: rgba(22, 22, 29, 0.95);
     --text-main: #ecf0f1;
     --text-muted: #a0a0a0;
     --accent: #8e44ad;
     --accent-glow: #9b59b6;
     --border: #333;
-    /* Lab Defaults */
+    /* Lab Panels */
     --lab-sidebar: rgba(22, 22, 29, 0.95);
     --lab-bench: rgba(44, 62, 80, 0.95);
     --lab-grid-1: rgba(255, 255, 255, 0.05);
     --lab-grid-2: rgba(255, 255, 255, 0.05);
-    /* Tool Visuals */
+    /* Visuals */
     --glass-border: #a4b0be;
     --glass-bg: rgba(255, 255, 255, 0.2);
     --glass-dark-bg: #2d3436;
@@ -27,98 +24,74 @@
 }
 
 
-/* THEME: LIGHT MODE */
+/* =========================================
+   2. THEME CONFIGURATION
+   ========================================= */
+
+
+/* Dark Mode (Default) */
+
+body {
+    background-image: url('dark-mode-bg.png') !important;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    color: var(--text-main);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+
+/* Light Mode */
 
 body.theme-light {
+    background-image: url('light-mode-bg.png') !important;
     --bg-main: #f5f6fa;
-    --bg-panel: rgba(255, 255, 255, 0.95);
-    --bg-nav: rgba(255, 255, 255, 0.95);
     --text-main: #2f3542;
     --text-muted: #57606f;
     --accent: #3742fa;
     --accent-glow: #5352ed;
     --border: #dcdde1;
     --lab-sidebar: rgba(255, 255, 255, 0.95);
-    --lab-bench: rgba(223, 230, 233, 0.95);
+    --lab-bench: rgba(74, 81, 83, 0.95);
     --lab-grid-1: rgba(0, 0, 0, 0.05);
     --lab-grid-2: rgba(0, 0, 0, 0.05);
 }
 
 
-/* THEME: BAHAY KUBO */
+/* Bahay Kubo */
 
 body.theme-bahay {
-    --bg-main: #fdf5e6;
-    --bg-panel: rgba(255, 248, 225, 0.95);
-    --bg-nav: rgba(215, 204, 200, 0.95);
-    --text-main: #3e2723;
-    --text-muted: #5d4037;
+    background-image: url('bahay-kubo-bg.png') !important;
+    --bg-main: #3d2f14;
+    --text-main: #ccbebb;
+    --text-muted: #3d2d28;
     --accent: #d35400;
     --accent-glow: #e67e22;
-    --border: #8d6e63;
-    --lab-sidebar: rgba(255, 243, 224, 0.95);
+    --border: #471c0c;
+    --lab-sidebar: rgba(167, 150, 124, 0.95);
     --lab-bench: rgba(93, 64, 55, 0.95);
     --lab-grid-1: rgba(255, 255, 255, 0.1);
     --lab-grid-2: rgba(255, 255, 255, 0.05);
 }
 
 body.theme-bahay .trash-zone {
-    border-color: #d35400 !important;
+    border: 3px dashed #d35400 !important;
+    background: rgba(255, 255, 255, 0.6) !important;
     color: #d35400 !important;
-    background: rgba(211, 84, 0, 0.1);
     opacity: 1 !important;
 }
 
 
-/* THEME: DOST */
-
-body.theme-dost {
-    --bg-main: #f0f8ff;
-    --bg-panel: rgba(255, 255, 255, 0.95);
-    --bg-nav: rgba(9, 132, 227, 0.95);
-    --text-main: #2f3542;
-    --text-muted: #636e72;
-    --accent: #00b894;
-    --accent-glow: #55efc4;
-    --border: #74b9ff;
-    --lab-sidebar: rgba(255, 255, 255, 0.95);
-    --lab-bench: rgba(45, 52, 54, 0.95);
-    --lab-grid-1: rgba(255, 255, 255, 0.05);
-    --lab-grid-2: rgba(255, 255, 255, 0.05);
-}
-
-body.theme-dost nav.site-nav .logo,
-body.theme-dost nav.site-nav a.nav-link {
-    color: white !important;
-}
-
-
 /* =========================================
-   2. GENERAL LAYOUT
+   3. GENERAL LAYOUT
    ========================================= */
 
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    color: var(--text-main);
-    background-color: var(--bg-main);
-    height: 100vh;
-    overflow-x: hidden;
-    user-select: none;
-    /* IMAGE PROPERTIES (Image is set by JS now) */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    transition: background-image 0.5s ease;
-}
 
-
-/* Ensure Lab is NEVER affected by background images */
+/* Lab Page: NO Background Image */
 
 body.lab-page {
     background-image: none !important;
-    background-color: var(--bg-main);
+    background-color: var(--bg-main) !important;
     overflow: hidden;
 }
 
@@ -127,12 +100,14 @@ body.lab-page {
 }
 
 
-/* Navigation */
+/* Navbar (Glassy 75px) */
 
 nav.site-nav {
-    height: 100px;
-    background: var(--bg-nav);
-    border-bottom: 1px solid var(--border);
+    height: 75px;
+    background: rgba(74, 74, 88, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(5px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -140,28 +115,56 @@ nav.site-nav {
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(10px);
+}
+
+
+/* Theme Navbar Overrides */
+
+body.theme-light nav.site-nav {
+    background: rgba(156, 115, 115, 0.05);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+body.theme-bahay nav.site-nav {
+    background: rgba(105, 91, 65, 0.05);
+    border-bottom-color: rgba(62, 39, 35, 0.2);
+}
+
+
+/* Logo */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
 }
 
 .logo img {
-    height: 80px;
+    height: 50px;
     width: auto;
     transition: transform 0.2s;
 }
 
-.logo img:hover {
+.logo:hover img {
     transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.5px;
 }
 
 
 /* Invert Logo for Dark Themes */
 
-body:not(.theme-light):not(.theme-bahay) .logo img {
+body:not(.theme-light) .logo img {
     filter: invert(1) brightness(2);
 }
 
-body.theme-light .logo img,
-body.theme-bahay .logo img {
+body.theme-light .logo img {
     filter: none;
 }
 
@@ -176,42 +179,43 @@ nav.site-nav a.nav-link {
     color: var(--text-main);
     font-weight: 600;
     text-transform: uppercase;
-    transition: 0.2s;
-}
-
-nav.site-nav a.nav-link:hover {
-    color: var(--accent);
+    font-size: 0.9rem;
 }
 
 .theme-select {
-    background: var(--bg-panel);
+    background: rgba(255, 255, 255, 0.15);
     color: var(--text-main);
     border: 1px solid var(--border);
-    padding: 8px 12px;
+    padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
-    outline: none;
 }
 
+.theme-select option {
+    background: #333;
+    color: white;
+}
 
-/* Buttons */
+body.theme-light .theme-select option,
+body.theme-bahay .theme-select option {
+    background: #fff;
+    color: #333;
+}
 
 .btn-primary,
 .modal-btn {
     background: var(--accent);
     color: white !important;
     border: none;
-    padding: 10px 25px;
+    padding: 8px 24px;
     font-weight: 700;
     cursor: pointer;
     border-radius: 50px;
-    transition: 0.2s;
     text-decoration: none;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    font-size: 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .btn-primary:hover,
@@ -221,39 +225,37 @@ nav.site-nav a.nav-link:hover {
 }
 
 
-/* Pages */
+/* Page Content */
 
 .page-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 100px);
+    min-height: calc(100vh - 75px);
     padding: 20px;
     text-align: center;
-    /* Transparent overlay so text is readable on images */
-    background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
 }
 
 .hero-title {
     font-size: 4rem;
     font-weight: 900;
     margin-bottom: 20px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .hero-text {
     font-size: 1.3rem;
-    opacity: 0.9;
     max-width: 600px;
     margin-bottom: 40px;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 10px;
+    background: rgba(58, 51, 51, 0.1);
+    padding: 15px;
     border-radius: 8px;
+    backdrop-filter: blur(5px);
 }
 
 
-/* About & Archive */
+/* Opaque backgrounds */
 
 .about-box {
     background: var(--bg-panel);
@@ -264,6 +266,17 @@ nav.site-nav a.nav-link:hover {
     border-radius: 12px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
     text-align: left;
+    backdrop-filter: blur(10px);
+    background-color: rgba(22, 22, 29, 0.05);
+    /* Default Dark */
+}
+
+body.theme-light .about-box {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+body.theme-bahay .about-box {
+    background-color: rgba(255, 248, 225, 0.2);
 }
 
 .archive-grid {
@@ -285,6 +298,7 @@ nav.site-nav a.nav-link:hover {
 .archive-card:hover {
     border-color: var(--accent);
     transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .archive-icon {
@@ -295,54 +309,53 @@ nav.site-nav a.nav-link:hover {
 
 
 /* =========================================
-   3. LAB INTERFACE
+   4. LAB INTERFACE
    ========================================= */
 
 .main-layout {
     display: flex;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 75px);
     width: 100%;
 }
 
 .sidebar {
-    width: 380px;
+    width: 280px;
     background: var(--lab-sidebar);
     border-right: 1px solid var(--border);
-    padding: 25px;
+    padding: 20px;
     overflow-y: auto;
     z-index: 50;
-    transition: background 0.3s;
 }
 
 .category h3 {
     color: var(--text-main);
     border-bottom: 2px solid var(--border);
     padding-bottom: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     text-transform: uppercase;
     font-size: 0.8rem;
-    letter-spacing: 1px;
     font-weight: 700;
 }
 
 .tool-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
 }
 
 .tool-item {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border);
     color: var(--text-main);
-    border-radius: 8px;
-    padding: 15px;
+    border-radius: 6px;
+    padding: 12px;
     text-align: center;
     cursor: grab;
     display: flex;
     flex-direction: column;
     align-items: center;
     transition: 0.2s;
+    font-size: 0.85rem;
 }
 
 .tool-item:hover {
@@ -372,20 +385,11 @@ nav.site-nav a.nav-link:hover {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 5rem;
-    color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.05);
     font-weight: 900;
     pointer-events: none;
-}
-
-.lab-console {
-    height: 150px;
-    background: var(--bg-panel);
-    border-top: 1px solid var(--border);
-    padding: 15px;
-    overflow-y: auto;
-    font-family: monospace;
-    color: var(--text-main);
-    z-index: 5;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .trash-zone {
@@ -410,23 +414,55 @@ nav.site-nav a.nav-link:hover {
     color: #e84118;
 }
 
-
-/* Lab Nav */
-
-.lab-page nav {
-    height: 90px;
-    background: var(--bg-nav);
-    border-bottom: 1px solid var(--border);
+.sidebar-right {
+    width: 280px;
+    background: var(--lab-sidebar);
+    border-left: 1px solid var(--border);
+    padding: 20px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    flex-direction: column;
+    z-index: 50;
 }
+
+.report-header {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-size: 0.9rem;
+}
+
+#live-log {
+    flex: 1;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.log-entry {
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 4px;
+}
+
+.log-entry span {
+    color: var(--accent-glow);
+    margin-right: 5px;
+}
+
+
+/* Lab Nav Controls */
 
 .nav-controls {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     align-items: center;
 }
 
@@ -434,37 +470,37 @@ nav.site-nav a.nav-link:hover {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--border);
     color: var(--text-main);
-    padding: 12px 24px;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.2s;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.95rem;
+    gap: 8px;
+    font-size: 0.9rem;
 }
 
 .control-btn:hover {
-    border-color: var(--accent);
     background: var(--accent);
+    border-color: var(--accent);
     color: white;
 }
 
-.btn-protocol {
-    color: var(--accent) !important;
-    border-color: var(--accent) !important;
-    background: rgba(55, 66, 250, 0.1) !important;
-}
-
-.btn-logout {
-    color: #e84118 !important;
-    border-color: #e84118 !important;
-}
-
-.btn-logout:hover {
-    background: #e84118 !important;
+.btn-end {
+    background: #e84118;
     color: white !important;
+    border: none;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-end:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+body.lab-page .control-btn {
+    color: var(--text-main) !important;
 }
 
 
@@ -487,11 +523,11 @@ nav.site-nav a.nav-link:hover {
 .mission-dossier,
 .success-card,
 .error-card {
-    background: var(--bg-panel);
+    background: var(--lab-sidebar);
     color: var(--text-main);
     border: 1px solid var(--border);
     border-radius: 12px;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
     animation: popIn 0.3s ease;
 }
 
@@ -529,9 +565,9 @@ nav.site-nav a.nav-link:hover {
 }
 
 .mission-card:hover {
-    border-color: var(--accent);
     background: var(--accent);
     color: white;
+    border-color: var(--accent);
 }
 
 .mission-card h4 {
@@ -593,9 +629,7 @@ nav.site-nav a.nav-link:hover {
 }
 
 
-/* =========================================
-   4. LAB ITEMS VISUALS
-   ========================================= */
+/* Lab Visuals */
 
 .lab-item {
     position: absolute;
@@ -605,7 +639,6 @@ nav.site-nav a.nav-link:hover {
     cursor: grab;
     z-index: 20;
     touch-action: none;
-    pointer-events: auto !important;
     transition: filter 0.2s;
 }
 
@@ -628,9 +661,6 @@ nav.site-nav a.nav-link:hover {
     box-shadow: 0 0 20px #fff, 0 0 40px #ff9f43 !important;
     animation: intenseSpark 0.1s infinite;
 }
-
-
-/* Glassware */
 
 .lab-item.beaker {
     width: 100px;
@@ -665,9 +695,6 @@ nav.site-nav a.nav-link:hover {
     border: 4px solid var(--glass-border);
     border-radius: 0 0 60px 60px;
 }
-
-
-/* Burner */
 
 .lab-item.heater {
     width: 80px;
@@ -706,17 +733,13 @@ nav.site-nav a.nav-link:hover {
     background: linear-gradient(to top, #00a8ff, transparent);
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
     position: absolute;
-    top: -45px;
-    /* Lowered flame */
+    top: -30px;
     left: 50%;
     transform: translateX(-50%);
-    filter: blur(4px);
+    filter: blur(2px);
     animation: flicker 0.1s infinite alternate;
     z-index: 1;
 }
-
-
-/* Tongs */
 
 .lab-item.tongs {
     width: 220px;
@@ -826,9 +849,6 @@ nav.site-nav a.nav-link:hover {
     transform-origin: right center;
 }
 
-
-/* Sidebar Icons */
-
 .sidebar-icon {
     width: 30px;
     height: 30px;
@@ -901,8 +921,14 @@ nav.site-nav a.nav-link:hover {
     transform: rotate(45deg);
 }
 
-
-/* Contents & Animations */
+.liquid {
+    width: 100%;
+    height: 0%;
+    transition: height 0.5s ease-out, background-color 0.3s;
+    border-radius: 0 0 10px 10px;
+    position: absolute;
+    bottom: 0;
+}
 
 .solid-ash {
     width: 50px;
@@ -923,15 +949,6 @@ nav.site-nav a.nav-link:hover {
     z-index: 9999;
     pointer-events: none;
     animation: fallDown 0.6s ease-in forwards;
-}
-
-.liquid {
-    width: 100%;
-    height: 0%;
-    transition: height 0.5s ease-in-out, background-color 0.3s;
-    border-radius: 0 0 10px 10px;
-    position: absolute;
-    bottom: 0;
 }
 
 .lab-item.tongs .solid-ribbon {
@@ -1001,4 +1018,120 @@ nav.site-nav a.nav-link:hover {
     100% {
         transform: rotate(5deg);
     }
+}
+
+
+/* =========================================
+   6. AUTHENTICATION PAGES (Login/Register)
+   ========================================= */
+
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 75px);
+    padding: 20px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 380px;
+    /* Reduced from 420px for a tighter look */
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    /* Glass Effect */
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    margin: 0 auto;
+    /* Ensures centering */
+}
+
+
+/* Theme Background Opacity */
+
+body:not(.theme-light):not(.theme-bahay) .auth-card {
+    background-color: rgba(22, 22, 29, 0.85);
+}
+
+body.theme-light .auth-card {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+body.theme-bahay .auth-card {
+    background-color: rgba(255, 248, 225, 0.9);
+}
+
+.auth-header {
+    margin-bottom: 30px;
+}
+
+.auth-header h2 {
+    font-size: 2rem;
+    color: var(--accent);
+    margin: 0 0 10px 0;
+}
+
+.auth-header p {
+    opacity: 0.7;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-main);
+    outline: none;
+    transition: 0.2s;
+    font-size: 1rem;
+    /* CRITICAL FIX: prevents the bar from overflowing to the right */
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
+}
+
+.btn-block {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+
+.auth-footer {
+    margin-top: 25px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.auth-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
 }

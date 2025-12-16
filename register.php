@@ -1,82 +1,91 @@
-<?php
-session_start();
-require 'db.php';
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-    
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    
-    if ($stmt->rowCount() > 0) {
-        $error = "Username already taken.";
-    } else {
-        $hashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-        if ($stmt->execute([$username, $hashed])) {
-            $_SESSION['user_id'] = $pdo->lastInsertId();
-            $_SESSION['username'] = $username;
-            // Redirects to HOME
-            header("Location: index.php");
-            exit;
-        } else {
-            $error = "Registration failed.";
-        }
-    }
-}
-?>
-
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Synthera</title>
+    <title>Synthera: Register</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="with-bg">
     <script>
-        // Apply saved theme immediately on load
         (function() {
             const savedTheme = localStorage.getItem('syntheraTheme');
-            if (savedTheme) {
-                document.body.className = savedTheme;
-                // If we are on the lab page, ensure lab-theme is added too
-                if(window.location.pathname.includes('lab.php')) {
-                    document.body.classList.add('lab-theme');
-                }
-            } else {
-                // Default behavior if no theme saved
-                if(window.location.pathname.includes('lab.php')) {
-                    document.body.className = 'lab-theme';
-                }
+            if (savedTheme && savedTheme !== 'dark') {
+                document.body.classList.add(savedTheme);
             }
         })();
-
-        // Function called by the dropdown
-        function changeTheme(theme) {
-            localStorage.setItem('syntheraTheme', theme);
-            document.body.className = theme;
-            if(window.location.pathname.includes('lab.php')) {
-                document.body.classList.add('lab-theme');
-            }
-        }
     </script>
-</head>
-<body>
+
     <nav class="site-nav">
-        <div class="logo">Synthera</div>
-        <a href="index.php">Back to Home</a>
+        <div class="logo">
+            <a href="index.php" class="logo">
+                <img src="logo.png" alt="Synthera Logo"> 
+                <span class="logo-text">Synthera.</span>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="index.php" class="nav-link">Home</a>
+            <select id="theme-select" class="theme-select" onchange="changeTheme(this.value)">
+                <option value="dark">Dark Mode (Default)</option>
+                <option value="theme-light">Light Mode</option>
+                <option value="theme-bahay">Bahay Kubo</option>
+            </select>
+        </div>
     </nav>
 
-    <div class="page-container">
-        <form class="auth-form" method="POST">
-            <h2>Create Account</h2>
-            <?php if(isset($error)) echo "<p style='color:#e84118'>$error</p>"; ?>
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Register</button>
-            <p>Already have an account? <a href="login.php">Login</a></p>
-        </form>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Join Synthera</h2>
+                <p>Create your virtual lab pass</p>
+            </div>
+            
+            <form action="register_process.php" method="POST">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="fullname" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="Choose a username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Create a strong password" required>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-block">Initialize Account</button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Already have an ID? <a href="login.php">Login Here</a></p>
+            </div>
+        </div>
     </div>
+
+    <script>
+        const currentTheme = localStorage.getItem('syntheraTheme') || 'dark';
+        document.getElementById('theme-select').value = currentTheme;
+
+        function changeTheme(themeName) {
+            document.body.classList.remove('theme-light', 'theme-bahay', 'theme-dost');
+            if (themeName !== 'dark') {
+                document.body.classList.add(themeName);
+            }
+            
+            const backgrounds = {
+                'dark': 'dark-mode-bg.jpg',
+                'theme-light': 'light-mode-bg.jpg',
+                'theme-bahay': 'bahay-kubo-bg.jpg'
+            };
+            const bgFile = backgrounds[themeName] || 'dark-mode-bg.jpg';
+            document.body.style.backgroundImage = `url('${bgFile}')`;
+
+            localStorage.setItem('syntheraTheme', themeName);
+        }
+    </script>
 </body>
 </html>

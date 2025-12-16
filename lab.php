@@ -9,7 +9,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synthera: Lab</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
@@ -84,33 +84,31 @@ session_start();
 
     <div id="lab-interface" class="interface-blur">
         <nav class="site-nav">
-            <div class="nav-left" style="display:flex; align-items:center; width:100%; justify-content:space-between;">
-                <div class="logo">
-                    <a href="index.php">
-                        <img src="logo.png" alt="Synthera Logo"> 
-                    </a>
-                </div>
-                
-                <div class="nav-controls">
-                    <select id="theme-selector" class="theme-select" onchange="setTheme(this.value)">
-                        <option value="dark">Dark Mode (Default)</option>
-                        <option value="theme-light">Light Mode</option>
-                        <option value="theme-bahay">Bahay Kubo</option>
-                        <option value="theme-dost">Modern DOST</option>
-                    </select>
+            <div class="logo">
+                <a href="index.php" class="logo">
+                    <img src="logo.png" alt="Synthera Logo">
+                    <span class="logo-text">Synthera.</span>
+                </a>
+            </div>
+            
+            <div class="nav-controls">
+                <select id="theme-selector" class="theme-select" onchange="setTheme(this.value)">
+                    <option value="dark">Dark Mode (Default)</option>
+                    <option value="theme-light">Light Mode</option>
+                    <option value="theme-bahay">Bahay Kubo</option>
+                </select>
 
-                    <a href="index.php" style="text-decoration:none;">
-                        <button class="control-btn"><i class="fa-solid fa-house"></i> Home</button>
-                    </a>
-                    <button class="control-btn btn-protocol" onclick="toggleMissionOverlay()">
-                        <i class="fa-solid fa-clipboard-list"></i> Info
-                    </button>
-                    <button class="control-btn" onclick="openMissionSelect()">Protocols</button>
-                    <button class="control-btn" onclick="restartMission()">Replay</button>
-                    <a href="logout.php" style="text-decoration:none;">
-                        <button class="control-btn btn-logout">Logout</button>
-                    </a>
-                </div>
+                <a href="index.php" style="text-decoration:none;">
+                    <button class="control-btn"><i class="fa-solid fa-house"></i> Home</button>
+                </a>
+                <button class="control-btn btn-protocol" onclick="toggleMissionOverlay()">
+                    <i class="fa-solid fa-clipboard-list"></i> Info
+                </button>
+                <button class="control-btn" onclick="openMissionSelect()">Protocols</button>
+                <button class="control-btn" onclick="restartMission()">Replay</button>
+                <a href="logout.php" style="text-decoration:none;">
+                    <button class="control-btn btn-logout">Logout</button>
+                </a>
             </div>
         </nav>
 
@@ -121,12 +119,18 @@ session_start();
                 <div class="category"><h3>Chemicals</h3><div id="list-chemicals" class="tool-grid"></div></div>
                 <div class="category"><h3>Solids</h3><div id="list-solids" class="tool-grid"></div></div>
             </div>
+
             <div class="workbench-container">
                 <div class="workbench" id="bench" ondrop="drop(event)" ondragover="allowDrop(event)">
                     <div class="bench-label">BENCH 01</div>
                     <div class="trash-zone"><i class="fa-solid fa-trash-can"></i></div>
                 </div>
-                <div class="lab-console"><div id="console-logs"></div></div>
+            </div>
+
+            <div class="sidebar-right">
+                <div class="report-header">Live Report</div>
+                <div id="live-log"></div>
+                <button class="control-btn btn-end" onclick="endExperiment()">End Experiment</button>
             </div>
         </div>
     </div>

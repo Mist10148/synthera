@@ -24,10 +24,10 @@ const inventory = {
 
 // --- 2. MISSIONS ---
 const missions = [
-    { title: "Protocol 01: Neutralization", desc: "Synthesize NaCl (Salt Water).", steps: ["1. Place Beaker.", "2. Add HCl.", "3. Add NaOH.", "4. Result: Clear Solution."], check: (items) => Object.values(items).some(i => i.contents.includes('hcl') && i.contents.includes('naoh')) ? "Sodium Chloride (NaCl)" : null },
-    { title: "Protocol 02: Phase Change", desc: "Boil Water to 100°C.", steps: ["1. Place Flask + Water.", "2. Heat to 100°C.", "3. Observe Steam."], check: (items) => Object.values(items).some(i => i.contents.includes('water') && i.temp >= 100) ? "Steam (H2O)" : null },
-    { title: "Protocol 03: Combustion", desc: "Burn Magnesium using Tongs.", steps: ["1. Drag Mg onto Tongs.", "2. Heat Tongs tip over flame.", "3. Drop Ash in Dish.", "WARNING: Dropping ash on floor fails experiment."], check: (items) => { const dish = Object.values(items).find(i => i.shape === 'dish'); return (dish && dish.contents.includes('mgo_ash')) ? "Magnesium Oxide (MgO) Ash" : null; } },
-    { title: "Protocol 04: Precipitation", desc: "Create Silver Chloride.", steps: ["1. Mix AgNO3 + NaCl."], check: (items) => Object.values(items).some(i => i.contents.includes('agcl')) ? "Silver Chloride (AgCl)" : null }
+    { title: "Protocol 01: Neutralization", desc: "Synthesize NaCl (Salt Water).", steps: ["1. Place Beaker.", "2. Add HCl.", "3. Add NaOH.", "4. Result: Clear Solution."], check: (items) => Object.values(items).some(i => i.contents.includes('hcl') && i.contents.includes('naoh')) ? " Sodium Chloride (NaCl)" : null },
+    { title: "Protocol 02: Phase Change", desc: "Boil Water to 100°C.", steps: ["1. Place Flask + Water.", "2. Heat to 100°C.", "3. Observe Steam."], check: (items) => Object.values(items).some(i => i.contents.includes('water') && i.temp >= 100) ? " Steam (H2O)" : null },
+    { title: "Protocol 03: Combustion", desc: "Burn Magnesium using Tongs.", steps: ["1. Drag Mg onto Tongs.", "2. Heat Tongs tip over flame.", "3. Drop Ash in Dish.", "WARNING: Dropping ash on floor fails experiment."], check: (items) => { const dish = Object.values(items).find(i => i.shape === 'dish'); return (dish && dish.contents.includes('mgo_ash')) ? " Magnesium Oxide (MgO) Ash" : null; } },
+    { title: "Protocol 04: Precipitation", desc: "Create Silver Chloride.", steps: ["1. Mix AgNO3 + NaCl."], check: (items) => Object.values(items).some(i => i.contents.includes('agcl')) ? " Silver Chloride (AgCl)" : null }
 ];
 
 let currentMissionIndex = null;
@@ -38,7 +38,7 @@ let missionActive = false;
 let missionStartTime = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Immediate Theme Apply
+    // Theme immediate apply
     const savedTheme = localStorage.getItem('syntheraTheme');
     if (savedTheme && savedTheme !== 'dark') {
         document.body.classList.add(savedTheme);
@@ -49,7 +49,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('mousemove', updateSmoothDrag);
 });
 
-// --- UI FUNCTIONS ---
+// LOGGING FUNCTION
+function logAction(message) {
+    const logBox = document.getElementById('live-log');
+    if (logBox) {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        const time = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        entry.innerHTML = `<span>[${time}]</span> ${message}`;
+        logBox.prepend(entry);
+    }
+}
+
 function openMissionSelect() {
     isLabPaused = true;
     document.getElementById('lab-interface').className = 'interface-blur';
@@ -62,12 +73,10 @@ function openMissionSelect() {
         card.className = 'mission-card';
         card.innerHTML = `<h4>${m.title}</h4><p>${m.desc}</p>`;
 
-        // FIX: Close window immediately and start mission
         card.onclick = (e) => {
-            e.stopPropagation();
             currentMissionIndex = idx;
-            document.getElementById('mission-select-modal').classList.add('hidden'); // Force Close
-            startMission(); // Start immediately
+            document.getElementById('mission-select-modal').classList.add('hidden');
+            startMission();
         };
         grid.appendChild(card);
     });
@@ -81,7 +90,6 @@ function loadMissionData(index) {
     const ul = document.getElementById('briefing-steps');
     ul.innerHTML = '';
     m.steps.forEach(s => ul.innerHTML += `<li>${s}</li>`);
-    document.getElementById('hud-mission-title').innerText = m.title;
 }
 
 function startMission() {
@@ -95,10 +103,15 @@ function startMission() {
     missionActive = true;
     missionStartTime = Date.now();
 
-    // Show current mission in HUD if active
     if (currentMissionIndex !== null) {
-        // You can add a small toast or label here if you want
-        console.log("Mission Started: " + missions[currentMissionIndex].title);
+        logAction(`Started: ${missions[currentMissionIndex].title}`);
+    }
+}
+
+function endExperiment() {
+    if (confirm("End current experiment?")) {
+        stayInSandbox();
+        logAction("Experiment Ended by User.");
     }
 }
 
@@ -123,7 +136,7 @@ function toggleMissionOverlay() {
     }
     const overlay = document.getElementById('mission-overlay');
     if (overlay.classList.contains('hidden')) {
-        loadMissionData(currentMissionIndex); // Refresh data
+        loadMissionData(currentMissionIndex);
         overlay.classList.remove('hidden');
         document.getElementById('lab-interface').className = 'interface-blur';
         isLabPaused = true;
@@ -137,6 +150,7 @@ function toggleMissionOverlay() {
 function resetBench() {
     itemsOnBench = {};
     document.getElementById('bench').innerHTML = `<div class="bench-label">BENCH 01</div><div class="trash-zone"><i class="fa-solid fa-trash-can"></i></div>`;
+    document.getElementById('live-log').innerHTML = '';
     document.querySelectorAll('.ash-mess').forEach(e => e.remove());
 }
 
@@ -196,6 +210,8 @@ function createItem(data, x, y) {
     el.ondragstart = function() { return false; };
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
+    logAction(`Placed ${data.name} on bench.`);
+
     if (data.type === 'container') {
         el.className = `lab-item ${data.shape}`;
         if (data.shape === 'tongs') el.innerHTML = `<div class="tongs-handles"></div><div class="tongs-pivot"></div><div class="tongs-body"><div class="tongs-arm-top"></div><div class="tongs-arm-bottom"></div></div><div class="tongs-tips"></div><div class="solid-holder"></div>`;
@@ -220,6 +236,9 @@ let dragOffsetY = 0;
 
 function startSmoothDrag(e) {
     if (isLabPaused) return;
+    // CRITICAL FIX: PREVENT DEFAULT TO STOP TEXT SELECTION HIGHLIGHTING
+    e.preventDefault();
+
     activeDragEl = e.target.closest('.lab-item');
     if (!activeDragEl) return;
     const rect = activeDragEl.getBoundingClientRect();
@@ -250,6 +269,7 @@ function stopSmoothDrag(e) {
     const trashRect = trash.getBoundingClientRect();
     const itemRect = activeDragEl.getBoundingClientRect();
     if (itemRect.left < trashRect.right && itemRect.right > trashRect.left && itemRect.top < trashRect.bottom && itemRect.bottom > trashRect.top) {
+        logAction(`Disposed ${itemsOnBench[activeDragEl.id].name}`);
         delete itemsOnBench[activeDragEl.id];
         activeDragEl.remove();
     }
@@ -293,9 +313,10 @@ function dropAshGravity(tongsId) {
             if (!dish.contents.includes('mgo_ash')) {
                 dish.contents.push('mgo_ash');
                 document.getElementById(catchDishId).appendChild(document.createElement('div')).className = 'solid-ash';
+                logAction("Ash collected in Evap Dish.");
             }
             if (missionActive && currentMissionIndex !== null) {
-                if (currentMissionIndex !== 2) { triggerLabError(`Incorrect Procedure! You performed 'Protocol 03: Combustion' instead of the active protocol.`, 'critical'); return; }
+                if (currentMissionIndex !== 2) { triggerLabError(`Incorrect Procedure!`, 'critical'); return; }
                 const res = missions[currentMissionIndex].check(itemsOnBench);
                 if (res) triggerSuccess(res);
             }
@@ -306,28 +327,31 @@ function dropAshGravity(tongsId) {
             mess.style.top = (startY + 250) + 'px';
             document.body.appendChild(mess);
             setTimeout(() => mess.remove(), 2000);
-            triggerLabError("Ash Spilled on Workbench! Contamination Risk.", missionActive ? 'critical' : 'warning');
+            triggerLabError("Ash Spilled on Workbench!", missionActive ? 'critical' : 'warning');
         }
     }, 600);
 }
 
-// FIX: Liquid Animation Logic
+// FIX: Liquid Fill Logic & Animation
 function fillLiquid(uid, liquid) {
     const item = itemsOnBench[uid];
     if (item.volume >= 100 || item.shape === 'tongs') return;
 
     item.contents.push(liquid.id);
-    item.volume += 25; // Increase 25% each time
+    item.volume += 25;
+    logAction(`Added ${liquid.name} to ${item.name}`);
 
-    const d = document.getElementById(uid).querySelector('.liquid');
+    const el = document.getElementById(uid);
+    const d = el.querySelector('.liquid');
+
     if (d) {
-        d.style.height = `${item.volume}%`; // CSS transition handles the animation
+        d.style.height = `${item.volume}%`;
         d.style.backgroundColor = liquid.color;
 
-        // Color mix check
         if (item.contents.includes('agno3') && item.contents.includes('nacl') && !item.contents.includes('agcl')) {
             item.contents.push('agcl');
-            d.style.backgroundColor = '#ecf0f1'; // Precipitate color
+            d.style.backgroundColor = '#ecf0f1';
+            logAction("Reaction: Precipitate formed (AgCl)");
         }
     }
 }
@@ -336,6 +360,8 @@ function fillSolid(uid, solid) {
     const item = itemsOnBench[uid];
     if (item.contents.length > 0) return;
     item.contents.push(solid.id);
+    logAction(`Added ${solid.name} to ${item.name}`);
+
     const el = document.getElementById(uid);
     const sDiv = document.createElement('div');
     sDiv.className = 'solid-ribbon';
@@ -364,6 +390,7 @@ setInterval(() => {
                 item.temp += 5;
                 if (item.temp > 100 && !item.contents.includes('mgo_ash')) {
                     el.classList.add('sparking');
+                    logAction("Reaction: Magnesium burning...");
                     setTimeout(() => {
                         el.classList.remove('sparking');
                         dropAshGravity(uid);
@@ -377,12 +404,12 @@ setInterval(() => {
         const success = missions[currentMissionIndex].check(itemsOnBench);
         if (success) { triggerSuccess(success); return; }
         for (let i = 0; i < missions.length; i++) {
-            if (i !== currentMissionIndex && i !== 2 && missions[i].check(itemsOnBench)) { triggerLabError(`Incorrect Procedure! You performed '${missions[i].title}' instead of the active protocol.`, 'critical'); return; }
+            if (i !== currentMissionIndex && i !== 2 && missions[i].check(itemsOnBench)) { triggerLabError(`Incorrect Procedure!`, 'critical'); return; }
         }
     }
 }, 100);
 
-// FIX: Relaxed heating collision detection (Massive Hitbox)
+// FIX: Expanded Heat Zone
 function isHeated(uid) {
     const r1 = document.getElementById(uid).getBoundingClientRect();
     if (itemsOnBench[uid].shape === 'tongs') {
@@ -391,7 +418,6 @@ function isHeated(uid) {
         for (let h in itemsOnBench) {
             if (itemsOnBench[h].type === 'heater') {
                 const r2 = document.getElementById(h).getBoundingClientRect();
-                // Huge heat zone: extends 250px up from the base
                 if (tipX > r2.left - 40 && tipX < r2.right + 40 && tipY > r2.top - 250 && tipY < r2.bottom) return true;
             }
         }
@@ -425,6 +451,9 @@ function triggerSuccess(name) {
         rank = 'B';
         rankClass = 'rank-b';
     }
+
+    logAction(`Mission Complete! Result: ${name} (Rank: ${rank})`);
+
     const modal = document.getElementById('success-modal');
     const card = modal.querySelector('.success-card');
     const badge = document.getElementById('rank-badge');
@@ -439,6 +468,7 @@ function triggerSuccess(name) {
 function triggerLabError(msg, type = 'critical') {
     missionActive = false;
     isLabPaused = true;
+    logAction(`Error: ${msg}`);
     const modal = document.getElementById('error-modal');
     const card = modal.querySelector('.error-card');
     const title = card.querySelector('h1');
@@ -470,7 +500,7 @@ function loadNextMission() {
     document.getElementById('success-modal').classList.add('hidden');
     if (currentMissionIndex + 1 < missions.length) {
         loadMissionData(currentMissionIndex + 1);
-        startMission(); // Immediate start
+        startMission();
     } else {
         alert("Complete!");
         openMissionSelect();
@@ -480,7 +510,7 @@ function loadNextMission() {
 function restartMission() { if (confirm("Restart?")) startMission(); }
 
 function setTheme(themeName) {
-    document.body.classList.remove('theme-light', 'theme-bahay', 'theme-dost');
+    document.body.classList.remove('theme-light', 'theme-bahay');
     if (themeName !== 'dark') {
         document.body.classList.add(themeName);
     }

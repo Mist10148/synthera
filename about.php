@@ -4,32 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Synthera: About</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="with-bg">
     <script>
         (function() {
-            const backgrounds = {
-                'dark': 'dark-mode-bg.jpg',
-                'theme-light': 'light-mode-bg.jpg',
-                'theme-bahay': 'bahay-kubo-bg.jpg',
-                'theme-dost': 'dost-bg.jpg'
-            };
-            const savedTheme = localStorage.getItem('syntheraTheme') || 'dark';
-            
+            const savedTheme = localStorage.getItem('syntheraTheme');
             if (savedTheme && savedTheme !== 'dark') {
                 document.body.classList.add(savedTheme);
             }
-            const bgFile = backgrounds[savedTheme] || 'dark-mode-bg.jpg';
-            document.body.style.backgroundImage = `url('${bgFile}')`;
         })();
     </script>
 
     <nav class="site-nav">
         <div class="logo">
-            <a href="index.php">
+            <a href="index.php" class="logo">
                 <img src="logo.png" alt="Synthera Logo"> 
+                <span class="logo-text">Synthera.</span>
             </a>
         </div>
 
@@ -41,7 +33,6 @@
                 <option value="dark">Dark Mode (Default)</option>
                 <option value="theme-light">Light Mode</option>
                 <option value="theme-bahay">Bahay Kubo</option>
-                <option value="theme-dost">Modern DOST</option>
             </select>
 
             <?php if(isset($_SESSION['user_id'])): ?>
@@ -89,7 +80,7 @@
         document.getElementById('theme-select').value = currentTheme;
 
         function changeTheme(themeName) {
-            document.body.classList.remove('theme-light', 'theme-bahay', 'theme-dost');
+            document.body.classList.remove('theme-light', 'theme-bahay');
             if (themeName !== 'dark') {
                 document.body.classList.add(themeName);
             }
@@ -97,8 +88,7 @@
             const backgrounds = {
                 'dark': 'dark-mode-bg.jpg',
                 'theme-light': 'light-mode-bg.jpg',
-                'theme-bahay': 'bahay-kubo-bg.jpg',
-                'theme-dost': 'dost-bg.jpg'
+                'theme-bahay': 'bahay-kubo-bg.jpg'
             };
             const bgFile = backgrounds[themeName] || 'dark-mode-bg.jpg';
             document.body.style.backgroundImage = `url('${bgFile}')`;
