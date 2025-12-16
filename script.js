@@ -874,3 +874,107 @@ document.addEventListener("DOMContentLoaded", initAIChatComposer);
 
 
 
+function initAIChatComposer() {
+    const aiOverlayEl = document.getElementById("ai-chat-overlay");
+    const aiBoxEl = document.getElementById("ai-chatbox");
+    if (!aiOverlayEl || !aiBoxEl) return;
+  
+    // 🔍 Find elements inside your chatbox
+    const input =
+      aiBoxEl.querySelector("#ai-chat-input") ||
+      aiBoxEl.querySelector('input[type="text"]') ||
+      aiBoxEl.querySelector("textarea");
+  
+    const sendBtn =
+      aiBoxEl.querySelector("#ai-chat-send") ||
+      aiBoxEl.querySelector('button[type="submit"]') ||
+      aiBoxEl.querySelector(".send-btn");
+  
+    const list =
+      aiBoxEl.querySelector("#ai-chat-messages") ||
+      aiBoxEl.querySelector(".chat-messages") ||
+      aiBoxEl.querySelector(".messages");
+  
+    const scrollWrap = aiBoxEl.querySelector(".ai-body") || list;
+  
+    if (!input || !sendBtn || !list) {
+      console.warn("[AI Chat] Missing UI elements.");
+      return;
+    }
+  
+    // --- Helper: Add Message to UI ---
+    const appendMessage = (text, who = "user", id = null) => {
+      const msg = document.createElement("div");
+      msg.className = `chat-msg ${who}`;
+      // Replace newlines with <br> for formatting
+      msg.innerHTML = text.replace(/\n/g, '<br>');
+      if (id) msg.id = id;
+      
+      list.appendChild(msg);
+      // Auto-scroll to bottom
+      scrollWrap.scrollTop = scrollWrap.scrollHeight;
+    };
+  
+    // --- Main Send Logic ---
+    const sendMessage = async () => {
+      const text = (input.value || "").trim();
+      if (!text) return;
+  
+      // 1. Show User Message
+      appendMessage(text, "user");
+      input.value = "";
+  
+      // 2. Show "Thinking..." Bubble
+      const loadingId = "ai-loading-" + Date.now();
+      appendMessage('<i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing...', "bot", loadingId);
+  
+      try {
+        // 3. Send to Python Backend
+        const response = await fetch("http://127.0.0.1:5000/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text })
+        });
+  
+        const data = await response.json();
+  
+        // 4. Remove Loading Bubble & Show Real Response
+        const loader = document.getElementById(loadingId);
+        if (loader) loader.remove();
+        
+        appendMessage(data.reply, "bot");
+  
+      } catch (error) {
+        console.error("AI Error:", error);
+        const loader = document.getElementById(loadingId);
+        if (loader) loader.innerText = "Error: Connection Failed.";
+      }
+    };
+  
+    // --- Event Listeners ---
+  
+    // Prevent Enter from submitting forms
+    const form = input.closest("form");
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        sendMessage();
+      });
+    }
+  
+    // Enter key to send
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  
+    // Click send button
+    sendBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      sendMessage();
+    });
+  
+    console.log("[AI Chat] Composer initialized with Python Backend ✅");
+}

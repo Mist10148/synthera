@@ -1442,3 +1442,51 @@ body.theme-bahay .auth-card {
 .chat-msg.bot  { margin-right: auto; }
 
 
+/* --- AI Chat Message Styles --- */
+
+/* User Message (Right Side, White) */
+.chat-msg.user {
+    align-self: flex-end;
+    background: #ffffff;
+    color: #000;
+    margin-left: auto;
+    border-bottom-right-radius: 4px; /* Slight edge for style */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Bot Message (Left Side, Blue Gradient) */
+.chat-msg.bot {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #2f6cff, #00b7ff);
+    color: #fff;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 4px 10px rgba(47, 108, 255, 0.2);
+}
+
+/* Loading Spinner Text */
+.chat-msg.bot i {
+    margin-right: 8px;
+}
+
+/* Adjust container to allow messages to sit on left/right */
+.ai-messages, 
+.chat-messages, 
+#ai-chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px;
+}
+
+.ai-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    /* Use your uploaded image here */
+    background-image: url('ai_coach_avatar.jpg');
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+    border: 2px solid #fff; /* Optional: adds a nice white ring */
+}
