@@ -141,12 +141,10 @@ session_start();
         </div>
     </div>
 
-            <!-- 🆕 Floating draggable orb -->
         <div id="float-orb" class="float-orb" title="Assistant">
         <i class="fa-solid fa-comment-dots"></i>
         </div>
 
-        <!-- 🆕 AI Chatbox Overlay (keep it under body so animation math is correct) -->
         <div id="ai-chat-overlay" class="ai-chat-overlay hidden">
         <div id="ai-chatbox" class="ai-chatbox">
             <div class="ai-topbar">
@@ -167,7 +165,6 @@ session_start();
                 <div class="ai-body">
                 <div class="ai-card-media"></div>
 
-                <!-- ✅ New messages list container -->
                 <div id="ai-chat-messages" class="ai-messages">
                     <div class="ai-bubble bot">
                     Hello! This lab protocol can be started now. What do you want to do?
@@ -201,5 +198,68 @@ session_start();
         const currentTheme = localStorage.getItem('syntheraTheme') || 'dark';
         document.getElementById('theme-selector').value = currentTheme;
     </script>
-</body>
+
+    <script>
+(function() {
+    const chatInput = document.getElementById('ai-chat-input');
+    const sendBtn = document.getElementById('ai-chat-send');
+    const messagesContainer = document.getElementById('ai-chat-messages');
+
+    function appendMessage(text, sender) {
+        const bubble = document.createElement('div');
+        bubble.classList.add('ai-bubble', sender);
+        bubble.textContent = text;
+        messagesContainer.appendChild(bubble);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return bubble;
+    }
+
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        chatInput.value = '';
+        appendMessage(text, 'user');
+
+        const botBubble = appendMessage('Thinking...', 'bot');
+
+        try {
+            const response = await fetch('http://localhost:5000/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: text })
+            });
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || 'Server error');
+            }
+
+            const reply = await response.text();
+
+            if (!reply) {
+                throw new Error('Empty response from server');
+            }
+
+            botBubble.textContent = reply;
+
+        } catch (error) {
+            console.error('AI CHAT ERROR:', error);
+            botBubble.textContent =
+                "Error: Lab Assistant is offline or unreachable. Make sure app.py is running.";
+            botBubble.style.color = "#ff6b6b";
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+})();
+</script>
+
+
+    </body>
 </html>
